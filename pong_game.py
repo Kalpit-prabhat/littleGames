@@ -1,6 +1,6 @@
 #Import's
 
-import pygame , sys
+import pygame , sys ,random
 
 #🤔🤔🤔 General Requirments 🤔🤔🤔
 
@@ -30,7 +30,7 @@ def ball_animation():
     if ball.top <= 0 or ball.bottom >= screen_height :
         ball_speed_y *= -1
     if ball.left <= 0 or ball.right >= screen_width:
-        ball_speed_x *= -1
+        ball_restart()
     if ball.colliderect(player1) or ball.colliderect(player2):
         ball_speed_x *= -1
 
@@ -41,6 +41,23 @@ def player1_animation():
     if player1.bottom >= screen_height :
         player1.bottom  = screen_height
 
+def bot():
+    if player2.top < ball.y :
+        player2.top  += player2_speed_bot 
+    if player2.top > ball.y :
+        player2.bottom -= player2_speed_bot
+    if player2.top <= 0:
+        player2.top = 0
+    if player2.bottom >= screen_height :
+        player2.bottom  = screen_height
+
+
+def ball_restart():
+    global ball_speed_x , ball_speed_y
+    ball.center = (screen_width/2 , screen_height/2)
+    ball_speed_y *= random.choice((1,-1))
+    ball_speed_x *= random.choice((1,-1))
+
 # 🧑🏿🧑🏿🧑🏿 Colours 🧑🏿🧑🏿🧑🏿
 bg_color = (128,128,128)
 light_grey = (200,200,200)
@@ -49,6 +66,9 @@ ball_speed_x =  7
 ball_speed_y = 7
 
 player_speed = 0
+player2_speed_bot = 7
+
+
 
 while True:
     for event in pygame.event.get():
@@ -71,7 +91,11 @@ while True:
 
     ball_animation()
     player1_animation()
+    bot()
+
     
+
+
     #🥴🥴🥴 Visuals 🥴🥴🥴 
     window.fill(bg_color)        
     pygame.draw.rect( window , light_grey , player1 )
