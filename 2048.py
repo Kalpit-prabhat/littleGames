@@ -10,17 +10,17 @@ running = True
 
 pygame.display.set_caption('2048')
 
-grid = {'a1':0,'b1':0,'c1':0,'d1':0,
-        'a2':0,'b2':0,'c2':0,'d2':0,
-        'a3':0,'b3':0,'c3':0,'d3':0,
-        'a4':0,'b4':0,'c4':0,'d4':0,}
-choices = random.sample(grid.keys(),2)
-grid[choices[0]] = 2
-grid[choices[1]] = 2
+grid = {'a1':2,'b1':0,'c1':0,'d1':128,
+        'a2':0,'b2':4,'c2':64,'d2':0,
+        'a3':0,'b3':0,'c3':8,'d3':0,
+        'a4':32,'b4':0,'c4':0,'d4':16,}
+# choices = random.sample(grid.keys(),2)
+# grid[choices[0]] = 2
+# grid[choices[1]] = 2
 
-colors = {2:(39, 127, 242), 4:(27, 160, 242), 8:(147, 242, 5),
-        16:(0,100,200), 32:(0,0,200), 64:(100,200,0),
-        128:(200,200,0)}
+colors = {2:(255, 154, 162), 4:(255, 183, 178), 8:(255, 218, 193),
+        16:(205, 238, 150), 32:(181, 234, 215), 64:(199, 206, 234),
+        128:(234, 199, 228)}
 
 position = {'a1':(0,0),'b1':(100,0),'c1':(200,0),'d1':(300,0),
         'a2':(0,100),'b2':(100,100),'c2':(200,100),'d2':(300,100),
@@ -39,9 +39,13 @@ def update(direction):
             for i in range(4):
                 for c in clms:
                     for r in '1234':
-                        if grid[c+r] and (grid[chr(ord(c)+d)+r] == 0 or grid[chr(ord(c)+d)+r] == grid[c+r]):
-                            grid[chr(ord(c)+d)+r] += grid[c+r]
-                            grid[c+r] = 0
+                        if grid[c+r]:
+                            if grid[chr(ord(c)+d)+r] == 0:
+                                grid[chr(ord(c)+d)+r] = grid[c+r]
+                                grid[c+r] = 0
+                            elif i == 3 and grid[chr(ord(c)+d)+r] == grid[c+r]:
+                                grid[chr(ord(c)+d)+r] += grid[c+r]
+                                grid[c+r] = 0
         elif direction[1] == 'y':
             if direction[0] == '-':
                 rows = '234'
@@ -52,15 +56,22 @@ def update(direction):
             for i in range(4):
                 for r in rows:
                     for c in 'abcd':
-                        if grid[c+r] and (grid[c+str(int(r)+d)] == 0 or grid[c+str(int(r)+d)] == grid[c+r]):
-                            grid[c+str(int(r)+d)] += grid[c+r]
-                            grid[c+r] = 0
+                        if grid[c+r]:
+                            if grid[c+str(int(r)+d)] == 0:
+                                grid[c+str(int(r)+d)] = grid[c+r]
+                                grid[c+r] = 0
+                            elif i == 3 and grid[c+str(int(r)+d)] == grid[c+r]:
+                                grid[c+str(int(r)+d)] += grid[c+r]
+                                grid[c+r] = 0
         empty = [cell for cell in grid.keys() if grid[cell] == 0]
         grid[random.choice(empty)] = random.choices([2,4],weights=[10,1])[0]
     return grid
 
+font = pygame.font.SysFont('data\\font.ttf',40)
+
 lst = ''
 while running:
+    pygame.time.wait(50)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -77,13 +88,19 @@ while running:
     
     if direction != lst:
         lst = direction
-        grid = update(direction)
-
-    win.fill((0,0,0))
+        grid_new = update(direction)
+        if grid_new == grid:
+            continue
+    win.fill((255,255,255))
     for cell,val in grid.items():
         if val:
-            pygame.draw.rect(win, colors[val], pygame.Rect(position[cell],(100,100)),50,10)
-    
+            rec = pygame.Rect(position[cell],(100,100))
+            text = font.render(str(val), True, (255,255,255))
+            textrect = text.get_rect(center=rec.center)
+            while val>128:
+                val = val//128
+            pygame.draw.rect(win, colors[val], rec,50,10)
+            win.blit(text,textrect)
     pygame.display.flip()
 
 pygame.quit()
