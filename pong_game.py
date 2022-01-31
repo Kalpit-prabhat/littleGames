@@ -1,6 +1,7 @@
 #Import's
 
 import pygame , sys ,random
+from pygame import mixer
 
 #🤔🤔🤔 General Requirments 🤔🤔🤔
 
@@ -15,6 +16,13 @@ screen_width = 1280
 screen_height = 960
 window = pygame.display.set_mode((screen_width,screen_height))
 pygame.display.set_caption('PONG')
+
+mixer.init()
+sound1 = mixer.Sound(r'data\2019-12-11_-_Retro_Platforming_-_David_Fesliyan.mp3')
+sound1.set_volume(0.3)
+sound1.play()
+sound2 = mixer.Sound('data\pong hit sound.mp3')
+
 
 #  😀😀😀 Game Rectangles 😀😀😀
 
@@ -33,6 +41,8 @@ def ball_animation():
         ball_restart()
     if ball.colliderect(player1) or ball.colliderect(player2):
         ball_speed_x *= -1
+        
+        sound2.play()
 
 def player1_animation():
     player1.y +=player_speed 
@@ -40,6 +50,13 @@ def player1_animation():
         player1.top = 0
     if player1.bottom >= screen_height :
         player1.bottom  = screen_height
+
+def player2_animation():
+    player2.y +=player_speed 
+    if player2.top <= 0:
+        player2.top = 0
+    if player2.bottom >= screen_height :
+        player2.bottom  = screen_height
 
 def bot():
     if player2.top < ball.y :
@@ -59,14 +76,14 @@ def ball_restart():
     ball_speed_x *= random.choice((1,-1))
 
 # 🧑🏿🧑🏿🧑🏿 Colours 🧑🏿🧑🏿🧑🏿
-bg_color = (128,128,128)
+bg_color = (0,0,0)
 light_grey = (200,200,200)
 
-ball_speed_x =  7
-ball_speed_y = 7
+ball_speed_x =  7 * random.choice((1,-1))
+ball_speed_y = 7 * random.choice((1,-1))
 
 player_speed = 0
-player2_speed_bot = 7
+player2_speed_bot = 0
 
 
 
@@ -79,19 +96,39 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN:
+            
+            
+            if event.key == pygame.K_s:
                 player_speed += 7
-            if event.key == pygame.K_UP:
+            if event.key == pygame.K_w:
                 player_speed -=7
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_DOWN:
+            
+            if event.key == pygame.K_s:
                 player_speed -= 7
-            if event.key == pygame.K_UP:
+            if event.key == pygame.K_w:
                 player_speed +=7
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_DOWN:
+                player2_speed_bot += 7
+            if event.key == pygame.K_UP:
+                player2_speed_bot -=7
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_DOWN:
+                player2_speed_bot -= 7
+            if event.key == pygame.K_UP:
+                player2_speed_bot +=7
+            
+
+        
+            
+        
+        
 
     ball_animation()
     player1_animation()
-    bot()
+    player2_animation()
 
     
 
