@@ -24,7 +24,7 @@ sound2 = mixer.Sound('data\pong hit sound.mp3')
 #  😀😀😀 Game Rectangles 😀😀😀
 
 ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)
-player1 = pygame.Rect(screen_width - 20, screen_height / 2 - 70, 10, 140)
+player1 = pygame.Rect(screen_width - 20 - 300 , screen_height / 2 - 70, 10 + 300 , 140)
 player2 = pygame.Rect(10, screen_height / 2 - 70, 10, 140)
 
 
@@ -113,12 +113,13 @@ red = (255, 0, 0)
 #
 ball_speed_x = 7 * random.choice((1, -1))
 ball_speed_y = 7 * random.choice((1, -1))
+
 player1_speed = 0
 player2_speed = 0
 
-#
 player1_score = 0
 player2_score = 0
+
 game_font = pygame.font.Font("freesansbold.ttf", 32)
 
 score_time = None
