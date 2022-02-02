@@ -8,25 +8,56 @@ from pygame import mixer
 pygame.init()
 clock = pygame.time.Clock()
 
+choose = True
+window = pygame.display.set_mode((400,400))
+single_player = pygame.image.load(r'data\singleplay.png').convert_alpha()
+sp_rect = single_player.get_rect()
+sp_rect.center = (200,100)
+multi_player = pygame.image.load(r'data\multiplay.png').convert_alpha()
+mp_rect = multi_player.get_rect()
+mp_rect.center = (200,300)
+window.blit(single_player,sp_rect)
+window.blit(multi_player,mp_rect)
+pygame.display.flip()
+while choose:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+    pos = pygame.mouse.get_pos()
+    if sp_rect.collidepoint(pos):
+        if pygame.mouse.get_pressed()[0] == 1:
+            multi = False
+            choose = False
+    if mp_rect.collidepoint(pos):
+        if pygame.mouse.get_pressed()[0] == 1:
+            multi = True
+            choose = False
+    clock.tick(80)
+pygame.quit()
+
+pygame.init()
+clock = pygame.time.Clock()
+pygame.mixer.pre_init(44100,-16,2,512)
+
 # 😒😒😒 Layout Of Main Window 😒😒😒
 
 screen_width = 1280
-screen_height = 960
+screen_height = 720
 window = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('PONG')
 
-mixer.init()
-sound1 = mixer.Sound(r'data\2019-12-11_-_Retro_Platforming_-_David_Fesliyan.mp3')
-sound1.set_volume(0.3)
-sound1.play()
-sound2 = mixer.Sound('data\pong hit sound.mp3')
+Backround_sound = mixer.Sound(r'data\2019-12-11_-_Retro_Platforming_-_David_Fesliyan.mp3')
+Backround_sound.set_volume(0.3)
+Backround_sound.play()
+pong_hit_sound = mixer.Sound(r'data\pong hit sound.mp3')
+pong_score_sound = mixer.Sound(r'data\score.mp3')
 
 #  😀😀😀 Game Rectangles 😀😀😀
 
 ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)
-player1 = pygame.Rect(screen_width - 20 - 300 , screen_height / 2 - 70, 10 + 300 , 140)
-player2 = pygame.Rect(10, screen_height / 2 - 70, 10, 140)
-
+player1 = pygame.Rect(screen_width - 20 , screen_height / 2 - 70, 10 , 140)
+player2 = pygame.Rect(10, screen_height / 2 - 70, 10  , 140)
 
 def ball_animation():
     global ball_speed_x, ball_speed_y, score_time
@@ -40,16 +71,34 @@ def ball_animation():
         global player1_score
         player1_score += 1
         score_time = pygame.time.get_ticks()
+        pygame.mixer.Sound.play(pong_score_sound)
+        pong_score_sound.set_volume(0.3)
 
     if ball.right >= screen_width:
         global player2_score
         player2_score += 1
         score_time = pygame.time.get_ticks()
+        pygame.mixer.Sound.play(pong_score_sound)
+        pong_score_sound.set_volume(0.3)
 
-    if ball.colliderect(player1) or ball.colliderect(player2):
-        ball_speed_x *= -1
-        sound2.play()
-
+    if ball.colliderect(player1) and ball_speed_x > 0 :
+        pygame.mixer.Sound.play(pong_hit_sound)
+        pong_hit_sound.set_volume(1.0)
+        if abs(ball.right - player1.left ) < 10:
+            ball_speed_x *= -1
+        elif abs(ball.bottom - player1.top) < 10 and ball_speed_y > 0:
+            ball_speed_y *= -1
+        elif abs(ball.top - player1.bottom) < 10 and ball_speed_y < 0:
+            ball_speed_y *= -1
+    if ball.colliderect(player2) and ball_speed_x < 0 :
+        pygame.mixer.Sound.play(pong_hit_sound)
+        pong_hit_sound.set_volume(1.0)
+        if abs(ball.left - player2.right) < 10:
+            ball_speed_x *= -1
+        elif abs(ball.bottom - player2.top) < 10 and ball_speed_y > 0:
+            ball_speed_y *= -1
+        elif abs(ball.top - player2.bottom) < 10 and ball_speed_y < 0:
+            ball_speed_y *= -1
 
 def player1_animation():
     player1.y += player1_speed
@@ -58,14 +107,12 @@ def player1_animation():
     if player1.bottom >= screen_height:
         player1.bottom = screen_height
 
-
 def player2_animation():
     player2.y += player2_speed
     if player2.top <= 0:
         player2.top = 0
     if player2.bottom >= screen_height:
         player2.bottom = screen_height
-
 
 def bot():
     if player2.top < ball.y:
@@ -76,7 +123,6 @@ def bot():
         player2.top = 0
     if player2.bottom >= screen_height:
         player2.bottom = screen_height
-
 
 def ball_restart():
     global ball_speed_x, ball_speed_y, score_time
@@ -104,9 +150,8 @@ def ball_restart():
         ball_speed_x = 7 * random.choice((1, -1))
         score_time = None
 
-
 # 🧑🏿🧑🏿🧑🏿 Colours 🧑🏿🧑🏿🧑🏿
-bg_color = (0, 0, 0)
+bg_color = pygame.Color('#2F373F')
 light_grey = (200, 200, 200)
 red = (255, 0, 0)
 
@@ -115,7 +160,10 @@ ball_speed_x = 7 * random.choice((1, -1))
 ball_speed_y = 7 * random.choice((1, -1))
 
 player1_speed = 0
-player2_speed = 0
+if multi:
+    player2_speed = 0
+else:
+    player2_speed = 7
 
 player1_score = 0
 player2_score = 0
@@ -132,17 +180,18 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_s:
-                player2_speed += 7
-            if event.key == pygame.K_w:
-                player2_speed -= 7
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_s:
-                player2_speed -= 7
-            if event.key == pygame.K_w:
-                player2_speed += 7
-
+        if multi:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_s:
+                    player2_speed += 7
+                if event.key == pygame.K_w:
+                    player2_speed -= 7
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_s:
+                    player2_speed -= 7
+                if event.key == pygame.K_w:
+                    player2_speed += 7
+        
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
                 player1_speed += 7
@@ -156,7 +205,10 @@ while True:
 
     ball_animation()
     player1_animation()
-    player2_animation()
+    if not multi:
+        bot()
+    else:
+        player2_animation()
 
     # 🥴🥴🥴 Visuals 🥴🥴🥴
     window.fill(bg_color)
@@ -167,8 +219,8 @@ while True:
 
     text1 = game_font.render(f"{player1_score}", True, light_grey)
     text2 = game_font.render(f"{player2_score}", True, light_grey)
-    window.blit(text1, (660, 470))
-    window.blit(text2, (600, 470))
+    window.blit(text1, (660, 350))
+    window.blit(text2, (600, 350))
 
     if score_time:
         ball_restart()
