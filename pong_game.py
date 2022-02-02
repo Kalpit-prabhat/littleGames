@@ -206,9 +206,9 @@ while True:
     ball_animation()
     player1_animation()
     if not multi:
-        bot()
-    else:
         player2_animation()
+    else:
+        bot()
 
     # 🥴🥴🥴 Visuals 🥴🥴🥴
     window.fill(bg_color)
