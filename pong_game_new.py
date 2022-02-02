@@ -6,6 +6,7 @@ from pygame import mixer
 # 🤔🤔🤔 General Requirments 🤔🤔🤔
 
 pygame.init()
+pygame.mixer.pre_init(44100,-16,2,512)
 clock = pygame.time.Clock()
 
 # 😒😒😒 Layout Of Main Window 😒😒😒
@@ -15,18 +16,17 @@ screen_height = 960
 window = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('PONG')
 
-mixer.init()
-sound1 = mixer.Sound(r'C:\Users\chaud\Desktop\ayushPingPongGamePy\littleGames\data\2019-12-11_-_Retro_Platforming_-_David_Fesliyan.mp3')
-sound1.set_volume(0.3)
-sound1.play()
-sound2 = mixer.Sound(r'C:\Users\chaud\Desktop\ayushPingPongGamePy\littleGames\data\pong hit sound.mp3')
+Backround_sound = mixer.Sound(r'C:\Users\chaud\Desktop\ayushPingPongGamePy\littleGames\data\2019-12-11_-_Retro_Platforming_-_David_Fesliyan.mp3')
+Backround_sound.set_volume(0.3)
+Backround_sound.play()
+pong_hit_sound = mixer.Sound(r'C:\Users\chaud\Desktop\ayushPingPongGamePy\littleGames\data\pong hit sound.mp3')
+pong_score_sound = mixer.Sound(r'C:\Users\chaud\Desktop\ayushPingPongGamePy\littleGames\data\score.mp3')
 
 #  😀😀😀 Game Rectangles 😀😀😀
 
 ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)
-player1 = pygame.Rect(screen_width - 20  , screen_height / 2 - 70, 10 , 140)
-player2 = pygame.Rect(10, screen_height / 2 - 70, 10, 140)
-
+player1 = pygame.Rect(screen_width - 20 , screen_height / 2 - 70, 10 , 140)
+player2 = pygame.Rect(10, screen_height / 2 - 70, 10  , 140)
 
 def ball_animation():
     global ball_speed_x, ball_speed_y, score_time
@@ -40,20 +40,34 @@ def ball_animation():
         global player1_score
         player1_score += 1
         score_time = pygame.time.get_ticks()
+        pygame.mixer.Sound.play(pong_score_sound)
+        pong_score_sound.set_volume(0.3)
 
     if ball.right >= screen_width:
         global player2_score
         player2_score += 1
         score_time = pygame.time.get_ticks()
+        pygame.mixer.Sound.play(pong_score_sound)
+        pong_score_sound.set_volume(0.3)
 
     if ball.colliderect(player1) and ball_speed_x > 0 :
+        pygame.mixer.Sound.play(pong_hit_sound)
+        pong_hit_sound.set_volume(1.0)
         if abs(ball.right - player1.left ) < 10:
             ball_speed_x *= -1
-    
+        elif abs(ball.bottom - player1.top) < 10 and ball_speed_y > 0:
+            ball_speed_y *= -1
+        elif abs(ball.top - player1.bottom) < 10 and ball_speed_y < 0:
+            ball_speed_y *= -1
     if ball.colliderect(player2) and ball_speed_x < 0 :
+        pygame.mixer.Sound.play(pong_hit_sound)
+        pong_hit_sound.set_volume(1.0)
         if abs(ball.left - player2.right) < 10:
             ball_speed_x *= -1
-
+        elif abs(ball.bottom - player2.top) < 10 and ball_speed_y > 0:
+            ball_speed_y *= -1
+        elif abs(ball.top - player2.bottom) < 10 and ball_speed_y < 0:
+            ball_speed_y *= -1
 
 def player1_animation():
     player1.y += player1_speed
@@ -62,14 +76,12 @@ def player1_animation():
     if player1.bottom >= screen_height:
         player1.bottom = screen_height
 
-
 def player2_animation():
     player2.y += player2_speed
     if player2.top <= 0:
         player2.top = 0
     if player2.bottom >= screen_height:
         player2.bottom = screen_height
-
 
 def bot():
     if player2.top < ball.y:
@@ -80,7 +92,6 @@ def bot():
         player2.top = 0
     if player2.bottom >= screen_height:
         player2.bottom = screen_height
-
 
 def ball_restart():
     global ball_speed_x, ball_speed_y, score_time
@@ -108,9 +119,8 @@ def ball_restart():
         ball_speed_x = 7 * random.choice((1, -1))
         score_time = None
 
-
 # 🧑🏿🧑🏿🧑🏿 Colours 🧑🏿🧑🏿🧑🏿
-bg_color = (0, 0, 0)
+bg_color = pygame.Color('#2F373F')
 light_grey = (200, 200, 200)
 red = (255, 0, 0)
 
