@@ -12,15 +12,15 @@ clock = pygame.time.Clock()
 # 😒😒😒 Layout Of Main Window 😒😒😒
 
 screen_width = 1280
-screen_height = 960
+screen_height = 720
 window = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('PONG')
 
-Backround_sound = mixer.Sound(r'C:\Users\chaud\Desktop\ayushPingPongGamePy\littleGames\data\2019-12-11_-_Retro_Platforming_-_David_Fesliyan.mp3')
+Backround_sound = mixer.Sound(r'data\2019-12-11_-_Retro_Platforming_-_David_Fesliyan.mp3')
 Backround_sound.set_volume(0.3)
 Backround_sound.play()
-pong_hit_sound = mixer.Sound(r'C:\Users\chaud\Desktop\ayushPingPongGamePy\littleGames\data\pong hit sound.mp3')
-pong_score_sound = mixer.Sound(r'C:\Users\chaud\Desktop\ayushPingPongGamePy\littleGames\data\score.mp3')
+pong_hit_sound = mixer.Sound(r'data\pong hit sound.mp3')
+pong_score_sound = mixer.Sound(r'data\score.mp3')
 
 #  😀😀😀 Game Rectangles 😀😀😀
 
@@ -181,8 +181,8 @@ while True:
 
     text1 = game_font.render(f"{player1_score}", True, light_grey)
     text2 = game_font.render(f"{player2_score}", True, light_grey)
-    window.blit(text1, (660, 470))
-    window.blit(text2, (600, 470))
+    window.blit(text1, (660, 350))
+    window.blit(text2, (600, 350))
 
     if score_time:
         ball_restart()
