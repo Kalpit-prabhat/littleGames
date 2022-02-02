@@ -5,10 +5,13 @@ win = pygame.display.set_mode((600, 400))
 clock = pygame.time.Clock()
 pygame.display.set_caption('2048')
 
+data = open(r'data\data.txt','r+')
 FPS=60
 TIME = 0.15
 ALPHA = 100
-Highscore = 0
+Highscore = int(data.readline())
+data.truncate(0)
+data.seek(0)
 
 score = 0
 pressed = False
@@ -224,7 +227,14 @@ while running:
             textrect = text.get_rect(center=(200,200))
             win.blit(text,textrect)
             pygame.display.flip()
-            running = False
+            if score > Highscore:
+                Highscore = score
+                pygame.draw.rect(win, (0,0,0), high_rect)
+                high_text = font.render(str(Highscore), True, (255, 255, 255))
+                high_rect = high_text.get_rect(center=(500,200))
+                win.blit(score_text,high_rect)
     clock.tick(FPS)
     pygame.display.flip()
-
+pygame.quit()
+data.write(str(Highscore))
+data.close()
