@@ -205,7 +205,7 @@ while True:
 
     ball_animation()
     player1_animation()
-    if not multi:
+    if multi:
         player2_animation()
     else:
         bot()
