@@ -2,8 +2,15 @@ import pygame, sys
 import numpy 
 
 pygame.init()#initialising mod
+pygame.mixer.init()
+pygame.mixer.music.load(r"data\Aria_Math.mp3")
+pygame.mixer.music.set_volume(0.3)                                                      # background music
+pygame.mixer.music.play(-1)
 running = True
 pressed = False
+
+
+
 
 #graphic attributes
 WIDTH = 600
